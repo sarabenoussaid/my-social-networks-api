@@ -1,0 +1,2923 @@
+{
+  "info": {
+    "name": "My Social Networks API — TP",
+    "description": "Catalogue complet et scénario de validation. Exécuter uniquement le dossier 00 pour un test en chaîne. Les autres dossiers sont des références à utiliser individuellement.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://localhost:3000"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "email",
+      "value": "alice@example.com"
+    },
+    {
+      "key": "password",
+      "value": "DemoPassword123!"
+    },
+    {
+      "key": "buyerEmail",
+      "value": "buyer@example.com"
+    },
+    {
+      "key": "shoppingId",
+      "value": ""
+    },
+    {
+      "key": "questionId",
+      "value": ""
+    },
+    {
+      "key": "ticketTypeId",
+      "value": ""
+    },
+    {
+      "key": "threadId",
+      "value": ""
+    },
+    {
+      "key": "eventId",
+      "value": ""
+    },
+    {
+      "key": "groupId",
+      "value": ""
+    },
+    {
+      "key": "carpoolId",
+      "value": ""
+    },
+    {
+      "key": "messageId",
+      "value": ""
+    },
+    {
+      "key": "photoId",
+      "value": ""
+    },
+    {
+      "key": "answerId",
+      "value": ""
+    },
+    {
+      "key": "commentId",
+      "value": ""
+    },
+    {
+      "key": "albumId",
+      "value": ""
+    },
+    {
+      "key": "userId",
+      "value": ""
+    },
+    {
+      "key": "pollId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "00 — Scénario de validation",
+      "item": [
+        {
+          "name": "POST /users",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/users",
+            "description": "Créer un compte : `firstname`, `lastname`, `age`, `email`, `password`\nRéponse attendue : HTTP 201 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstname\": \"Alice\",\n  \"lastname\": \"Martin\",\n  \"age\": 22,\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const suffix = Date.now();",
+                  "pm.collectionVariables.set(\"email\", `alice.${suffix}@example.com`);",
+                  "pm.collectionVariables.set(\"buyerEmail\", `buyer.${suffix}@example.com`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 201) {",
+                  "const data = pm.response.json();",
+                  "pm.collectionVariables.set(\"userId\", data._id || data.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /auth/login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/login",
+            "description": "Se connecter : `email`, `password` → `token`\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "pm.collectionVariables.set(\"token\", data.token); pm.collectionVariables.set(\"userId\", data.user.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/users",
+            "description": "Lister les utilisateurs\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /group",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/group",
+            "description": "Créer un groupe\nRéponse attendue : HTTP 201 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Groupe Paris\",\n  \"description\": \"Sorties\",\n  \"type\": \"public\",\n  \"allow_members_to_post\": true,\n  \"allow_members_to_create_events\": true,\n  \"members\": [],\n  \"admins\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 201) {",
+                  "const data = pm.response.json();",
+                  "pm.collectionVariables.set(\"groupId\", data._id || data.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /event",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/event",
+            "description": "Créer un événement\nRéponse attendue : HTTP 201 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Soiree Paris\",\n  \"description\": \"Rencontre\",\n  \"start_date\": \"2027-06-01T18:00:00Z\",\n  \"end_date\": \"2027-06-01T22:00:00Z\",\n  \"location\": \"Paris\",\n  \"visibility\": \"public\",\n  \"ticketing\": true,\n  \"shopping_list\": true,\n  \"carpooling\": true,\n  \"group\": \"{{groupId}}\",\n  \"invite_group_members\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 201) {",
+                  "const data = pm.response.json();",
+                  "pm.collectionVariables.set(\"eventId\", data._id || data.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /event/:id/share",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/event/{{eventId}}/share",
+            "description": "Générer des liens de partage pour un événement public dans un groupe public\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /event/:id/thread",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/event/{{eventId}}/thread",
+            "description": "Fil de l'événement\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "pm.collectionVariables.set(\"threadId\", data._id || data.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /thread/:idthread/message",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/thread/{{threadId}}/message",
+            "description": "Poster `{ \"content\": \"...\", \"reply_to\": \"<messageId>\" }` (`reply_to` facultatif)\nRéponse attendue : HTTP 201 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Bonjour\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 201) {",
+                  "const data = pm.response.json();",
+                  "pm.collectionVariables.set(\"messageId\", data._id || data.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /thread/:idthread/message/:idmessage",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/thread/{{threadId}}/message/{{messageId}}",
+            "description": "Modifier son message\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Bonjour à tous\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /thread/:idthread/messages",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/thread/{{threadId}}/messages",
+            "description": "Messages du fil (ordre chronologique)\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /album",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/album",
+            "description": "`{ \"title\": \"...\", \"description\": \"...\", \"event\": \"<eventId>\" }`\nRéponse attendue : HTTP 201 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Souvenirs\",\n  \"description\": \"Photos\",\n  \"event\": \"{{eventId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 201) {",
+                  "const data = pm.response.json();",
+                  "pm.collectionVariables.set(\"albumId\", data._id || data.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /album/:idalbum/photo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/album/{{albumId}}/photo",
+            "description": "`{ \"title\": \"...\", \"url\": \"https://...\", \"description\": \"...\" }`\nRéponse attendue : HTTP 201 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Photo\",\n  \"url\": \"https://example.com/photo.jpg\",\n  \"description\": \"Paris\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 201) {",
+                  "const data = pm.response.json();",
+                  "pm.collectionVariables.set(\"photoId\", data._id || data.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /album/:idalbum/photo/:idphoto/comment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/album/{{albumId}}/photo/{{photoId}}/comment",
+            "description": "`{ \"content\": \"...\" }`\nRéponse attendue : HTTP 201 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Super photo\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 201) {",
+                  "const data = pm.response.json();",
+                  "pm.collectionVariables.set(\"commentId\", data._id || data.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /event/:idevent/poll",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/event/{{eventId}}/poll",
+            "description": "Créer un sondage\nRéponse attendue : HTTP 201 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Menu\",\n  \"questions\": [\n    {\n      \"label\": \"Quel menu ?\",\n      \"answers\": [\n        \"Pizza\",\n        \"Sushi\"\n      ]\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 201) {",
+                  "const data = pm.response.json();",
+                  "pm.collectionVariables.set(\"pollId\", data._id || data.id);",
+                  "pm.collectionVariables.set(\"questionId\", data.questions[0]._id); pm.collectionVariables.set(\"answerId\", data.questions[0].answers[0]._id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /poll/:id",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/poll/{{pollId}}",
+            "description": "Modifier avant le premier vote\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Menu\",\n  \"questions\": [\n    {\n      \"label\": \"Quel menu ?\",\n      \"answers\": [\n        \"Pizza\",\n        \"Sushi\"\n      ]\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "pm.collectionVariables.set(\"questionId\", data.questions[0]._id); pm.collectionVariables.set(\"answerId\", data.questions[0].answers[0]._id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /poll/:id/response",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/poll/{{pollId}}/response",
+            "description": "Répondre (une seule fois)\nRéponse attendue : HTTP 201 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"answers\": [\n    {\n      \"question\": \"{{questionId}}\",\n      \"answer\": \"{{answerId}}\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 201) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /poll/:id/results",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/poll/{{pollId}}/results",
+            "description": "Nombre de votes par réponse\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /event/:idevent/ticket-type",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/event/{{eventId}}/ticket-type",
+            "description": "`{ \"name\": \"Standard\", \"amount\": 15, \"quantity\": 100 }`\nRéponse attendue : HTTP 201 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Standard\",\n  \"amount\": 15,\n  \"quantity\": 100\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 201) {",
+                  "const data = pm.response.json();",
+                  "pm.collectionVariables.set(\"ticketTypeId\", data._id || data.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /event/:idevent/ticket",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/event/{{eventId}}/ticket",
+            "description": "Acheter un billet\nRéponse attendue : HTTP 201 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ticket_type\": \"{{ticketTypeId}}\",\n  \"firstname\": \"Jean\",\n  \"lastname\": \"Dupont\",\n  \"email\": \"{{buyerEmail}}\",\n  \"address\": {\n    \"street\": \"10 rue de la Paix\",\n    \"zip_code\": \"75002\",\n    \"city\": \"Paris\",\n    \"country\": \"France\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 201) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /event/:idevent/shopping-item",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/event/{{eventId}}/shopping-item",
+            "description": "Ajouter ce qu'on apporte\nRéponse attendue : HTTP 201 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Chips\",\n  \"quantity\": 3,\n  \"arrival_time\": \"2027-06-01T17:30:00Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 201) {",
+                  "const data = pm.response.json();",
+                  "pm.collectionVariables.set(\"shoppingId\", data._id || data.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /event/:idevent/carpool",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/event/{{eventId}}/carpool",
+            "description": "Proposer un trajet (on en devient le conducteur)\nRéponse attendue : HTTP 201 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"departure_location\": \"Paris\",\n  \"departure_time\": \"2027-06-01T16:00:00Z\",\n  \"price\": 10,\n  \"seats\": 3,\n  \"max_detour\": 30\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 201) {",
+                  "const data = pm.response.json();",
+                  "pm.collectionVariables.set(\"carpoolId\", data._id || data.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Conflit attendu 409 — POST /users",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/users",
+            "description": "Créer un compte : `firstname`, `lastname`, `age`, `email`, `password`\nRéponse attendue : HTTP 201 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstname\": \"Alice\",\n  \"lastname\": \"Martin\",\n  \"age\": 22,\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Conflit 409\", () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Conflit attendu 409 — POST /poll/:id/response",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/poll/{{pollId}}/response",
+            "description": "Répondre (une seule fois)\nRéponse attendue : HTTP 201 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"answers\": [\n    {\n      \"question\": \"{{questionId}}\",\n      \"answer\": \"{{answerId}}\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Conflit 409\", () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Conflit attendu 409 — POST /event/:idevent/ticket",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/event/{{eventId}}/ticket",
+            "description": "Acheter un billet\nRéponse attendue : HTTP 201 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ticket_type\": \"{{ticketTypeId}}\",\n  \"firstname\": \"Jean\",\n  \"lastname\": \"Dupont\",\n  \"email\": \"{{buyerEmail}}\",\n  \"address\": {\n    \"street\": \"10 rue de la Paix\",\n    \"zip_code\": \"75002\",\n    \"city\": \"Paris\",\n    \"country\": \"France\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Conflit 409\", () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Conflit attendu 409 — POST /event/:idevent/shopping-item",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/event/{{eventId}}/shopping-item",
+            "description": "Ajouter ce qu'on apporte\nRéponse attendue : HTTP 201 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Chips\",\n  \"quantity\": 3,\n  \"arrival_time\": \"2027-06-01T17:30:00Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Conflit 409\", () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Utilisateurs et authentification",
+      "item": [
+        {
+          "name": "POST /users",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/users",
+            "description": "Créer un compte : `firstname`, `lastname`, `age`, `email`, `password`\nRéponse attendue : HTTP 201 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstname\": \"Alice\",\n  \"lastname\": \"Martin\",\n  \"age\": 22,\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 201) {",
+                  "const data = pm.response.json();",
+                  "pm.collectionVariables.set(\"userId\", data._id || data.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /auth/login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/login",
+            "description": "Se connecter : `email`, `password` → `token`\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "pm.collectionVariables.set(\"token\", data.token); pm.collectionVariables.set(\"userId\", data.user.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/users",
+            "description": "Lister les utilisateurs\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /users/:id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/users/{{userId}}",
+            "description": "Détail d'un utilisateur\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /users/:id",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/users/{{userId}}",
+            "description": "Modifier `firstname`, `lastname`, `age`\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstname\": \"Alice\",\n  \"lastname\": \"Martin\",\n  \"age\": 23\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /users/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/users/{{userId}}",
+            "description": "Supprimer un utilisateur\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Groupes",
+      "item": [
+        {
+          "name": "GET /groups",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/groups",
+            "description": "Groupes publics/privés + groupes secrets dont on est membre\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /group/:id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/group/{{groupId}}",
+            "description": "Détail avec administrateurs et membres\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /group",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/group",
+            "description": "Créer un groupe\nRéponse attendue : HTTP 201 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Groupe Paris\",\n  \"description\": \"Sorties\",\n  \"type\": \"public\",\n  \"allow_members_to_post\": true,\n  \"allow_members_to_create_events\": true,\n  \"members\": [],\n  \"admins\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 201) {",
+                  "const data = pm.response.json();",
+                  "pm.collectionVariables.set(\"groupId\", data._id || data.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /group/:id",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/group/{{groupId}}",
+            "description": "Modifier un groupe (tous les champs, `name` obligatoire)\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Groupe Paris\",\n  \"description\": \"Sorties\",\n  \"type\": \"public\",\n  \"allow_members_to_post\": true,\n  \"allow_members_to_create_events\": true,\n  \"members\": [],\n  \"admins\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /group/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/group/{{groupId}}",
+            "description": "Supprimer un groupe\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /group/:id/join",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/group/{{groupId}}/join",
+            "description": "Rejoindre un groupe public\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /group/:id/leave",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/group/{{groupId}}/leave",
+            "description": "Quitter le groupe (sauf dernier administrateur)\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Événements",
+      "item": [
+        {
+          "name": "GET /events",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/events",
+            "description": "Événements publics + événements dont on est participant\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /event/:id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/event/{{eventId}}",
+            "description": "Détail avec organisateurs, membres et groupe\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /event",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/event",
+            "description": "Créer un événement\nRéponse attendue : HTTP 201 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Soiree Paris\",\n  \"description\": \"Rencontre\",\n  \"start_date\": \"2027-06-01T18:00:00Z\",\n  \"end_date\": \"2027-06-01T22:00:00Z\",\n  \"location\": \"Paris\",\n  \"visibility\": \"public\",\n  \"ticketing\": true,\n  \"shopping_list\": true,\n  \"carpooling\": true,\n  \"group\": \"{{groupId}}\",\n  \"invite_group_members\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 201) {",
+                  "const data = pm.response.json();",
+                  "pm.collectionVariables.set(\"eventId\", data._id || data.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /event/:id",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/event/{{eventId}}",
+            "description": "Modifier un événement\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Soiree Paris\",\n  \"description\": \"Rencontre\",\n  \"start_date\": \"2027-06-01T18:00:00Z\",\n  \"end_date\": \"2027-06-01T22:00:00Z\",\n  \"location\": \"Paris\",\n  \"visibility\": \"public\",\n  \"ticketing\": true,\n  \"shopping_list\": true,\n  \"carpooling\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /event/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/event/{{eventId}}",
+            "description": "Supprimer un événement et ses données\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /event/:id/join",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/event/{{eventId}}/join",
+            "description": "Participer à un événement public\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /event/:id/leave",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/event/{{eventId}}/leave",
+            "description": "Quitter l'événement (sauf dernier organisateur)\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /event/:id/share",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/event/{{eventId}}/share",
+            "description": "Générer des liens de partage pour un événement public dans un groupe public\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Fils de discussion",
+      "item": [
+        {
+          "name": "GET /group/:id/thread",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/group/{{groupId}}/thread",
+            "description": "Fil du groupe\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "pm.collectionVariables.set(\"threadId\", data._id || data.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /event/:id/thread",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/event/{{eventId}}/thread",
+            "description": "Fil de l'événement\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "pm.collectionVariables.set(\"threadId\", data._id || data.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /thread/:idthread/messages",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/thread/{{threadId}}/messages",
+            "description": "Messages du fil (ordre chronologique)\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /thread/:idthread/message",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/thread/{{threadId}}/message",
+            "description": "Poster `{ \"content\": \"...\", \"reply_to\": \"<messageId>\" }` (`reply_to` facultatif)\nRéponse attendue : HTTP 201 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Bonjour\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 201) {",
+                  "const data = pm.response.json();",
+                  "pm.collectionVariables.set(\"messageId\", data._id || data.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /thread/:idthread/message/:idmessage",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/thread/{{threadId}}/message/{{messageId}}",
+            "description": "Supprimer un message\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /thread/:idthread/message/:idmessage",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/thread/{{threadId}}/message/{{messageId}}",
+            "description": "Modifier son message\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Bonjour à tous\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Albums, photos et commentaires",
+      "item": [
+        {
+          "name": "GET /albums",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/albums",
+            "description": "Albums des événements visibles\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /album/:id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/album/{{albumId}}",
+            "description": "Détail avec photos\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /album",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/album",
+            "description": "`{ \"title\": \"...\", \"description\": \"...\", \"event\": \"<eventId>\" }`\nRéponse attendue : HTTP 201 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Souvenirs\",\n  \"description\": \"Photos\",\n  \"event\": \"{{eventId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 201) {",
+                  "const data = pm.response.json();",
+                  "pm.collectionVariables.set(\"albumId\", data._id || data.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /album/:id",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/album/{{albumId}}",
+            "description": "`title`, `description`\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Souvenirs modifies\",\n  \"description\": \"Photos\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /album/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/album/{{albumId}}",
+            "description": "Supprime l'album, ses photos et leurs commentaires\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /album/:idalbum/photos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/album/{{albumId}}/photos",
+            "description": "Photos de l'album\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /album/:idalbum/photo/:idphoto",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/album/{{albumId}}/photo/{{photoId}}",
+            "description": "Détail d'une photo\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /album/:idalbum/photo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/album/{{albumId}}/photo",
+            "description": "`{ \"title\": \"...\", \"url\": \"https://...\", \"description\": \"...\" }`\nRéponse attendue : HTTP 201 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Photo\",\n  \"url\": \"https://example.com/photo.jpg\",\n  \"description\": \"Paris\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 201) {",
+                  "const data = pm.response.json();",
+                  "pm.collectionVariables.set(\"photoId\", data._id || data.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /album/:idalbum/photo/:idphoto",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/album/{{albumId}}/photo/{{photoId}}",
+            "description": "Modifier une photo\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Photo modifiee\",\n  \"url\": \"https://example.com/photo.jpg\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /album/:idalbum/photo/:idphoto",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/album/{{albumId}}/photo/{{photoId}}",
+            "description": "Supprimer une photo\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /album/:idalbum/photo/:idphoto/comments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/album/{{albumId}}/photo/{{photoId}}/comments",
+            "description": "Commentaires\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /album/:idalbum/photo/:idphoto/comment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/album/{{albumId}}/photo/{{photoId}}/comment",
+            "description": "`{ \"content\": \"...\" }`\nRéponse attendue : HTTP 201 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Super photo\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 201) {",
+                  "const data = pm.response.json();",
+                  "pm.collectionVariables.set(\"commentId\", data._id || data.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /album/:idalbum/photo/:idphoto/comment/:idcomment",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/album/{{albumId}}/photo/{{photoId}}/comment/{{commentId}}",
+            "description": "Supprimer un commentaire\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Sondages",
+      "item": [
+        {
+          "name": "GET /event/:idevent/polls",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/event/{{eventId}}/polls",
+            "description": "Sondages de l'événement\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /poll/:id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/poll/{{pollId}}",
+            "description": "Détail (ids des questions et des réponses)\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /event/:idevent/poll",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/event/{{eventId}}/poll",
+            "description": "Créer un sondage\nRéponse attendue : HTTP 201 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Menu\",\n  \"questions\": [\n    {\n      \"label\": \"Quel menu ?\",\n      \"answers\": [\n        \"Pizza\",\n        \"Sushi\"\n      ]\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 201) {",
+                  "const data = pm.response.json();",
+                  "pm.collectionVariables.set(\"pollId\", data._id || data.id);",
+                  "pm.collectionVariables.set(\"questionId\", data.questions[0]._id); pm.collectionVariables.set(\"answerId\", data.questions[0].answers[0]._id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /poll/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/poll/{{pollId}}",
+            "description": "Supprimer un sondage et ses réponses\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /poll/:id/response",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/poll/{{pollId}}/response",
+            "description": "Répondre (une seule fois)\nRéponse attendue : HTTP 201 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"answers\": [\n    {\n      \"question\": \"{{questionId}}\",\n      \"answer\": \"{{answerId}}\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 201) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /poll/:id/results",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/poll/{{pollId}}/results",
+            "description": "Nombre de votes par réponse\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /poll/:id",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/poll/{{pollId}}",
+            "description": "Modifier avant le premier vote\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Menu\",\n  \"questions\": [\n    {\n      \"label\": \"Quel menu ?\",\n      \"answers\": [\n        \"Pizza\",\n        \"Sushi\"\n      ]\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "pm.collectionVariables.set(\"questionId\", data.questions[0]._id); pm.collectionVariables.set(\"answerId\", data.questions[0].answers[0]._id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Billetterie",
+      "item": [
+        {
+          "name": "GET /event/:idevent/ticket-types",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/event/{{eventId}}/ticket-types",
+            "description": "Types de billets avec places restantes (`remaining`)\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /event/:idevent/ticket-type",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/event/{{eventId}}/ticket-type",
+            "description": "`{ \"name\": \"Standard\", \"amount\": 15, \"quantity\": 100 }`\nRéponse attendue : HTTP 201 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Standard\",\n  \"amount\": 15,\n  \"quantity\": 100\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 201) {",
+                  "const data = pm.response.json();",
+                  "pm.collectionVariables.set(\"ticketTypeId\", data._id || data.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /event/:idevent/ticket-type/:id",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/event/{{eventId}}/ticket-type/{{ticketTypeId}}",
+            "description": "Modifier (quantité ≥ billets déjà vendus)\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Standard\",\n  \"amount\": 16,\n  \"quantity\": 100\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /event/:idevent/ticket-type/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/event/{{eventId}}/ticket-type/{{ticketTypeId}}",
+            "description": "Supprimer un type sans billet vendu\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /event/:idevent/ticket",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/event/{{eventId}}/ticket",
+            "description": "Acheter un billet\nRéponse attendue : HTTP 201 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ticket_type\": \"{{ticketTypeId}}\",\n  \"firstname\": \"Jean\",\n  \"lastname\": \"Dupont\",\n  \"email\": \"{{buyerEmail}}\",\n  \"address\": {\n    \"street\": \"10 rue de la Paix\",\n    \"zip_code\": \"75002\",\n    \"city\": \"Paris\",\n    \"country\": \"France\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 201) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /event/:idevent/tickets",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/event/{{eventId}}/tickets",
+            "description": "Liste des billets achetés\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Shopping list (obligatoire)",
+      "item": [
+        {
+          "name": "GET /event/:idevent/shopping-items",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/event/{{eventId}}/shopping-items",
+            "description": "Liste des choses apportées (triée par heure d'arrivée)\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /event/:idevent/shopping-item",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/event/{{eventId}}/shopping-item",
+            "description": "Ajouter ce qu'on apporte\nRéponse attendue : HTTP 201 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Chips\",\n  \"quantity\": 3,\n  \"arrival_time\": \"2027-06-01T17:30:00Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 201) {",
+                  "const data = pm.response.json();",
+                  "pm.collectionVariables.set(\"shoppingId\", data._id || data.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /event/:idevent/shopping-item/:id",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/event/{{eventId}}/shopping-item/{{shoppingId}}",
+            "description": "Modifier un élément\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Chips\",\n  \"quantity\": 3,\n  \"arrival_time\": \"2027-06-01T17:30:00Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /event/:idevent/shopping-item/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/event/{{eventId}}/shopping-item/{{shoppingId}}",
+            "description": "Supprimer un élément\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Covoiturage (Bonus)",
+      "item": [
+        {
+          "name": "GET /event/:idevent/carpools",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/event/{{eventId}}/carpools",
+            "description": "Trajets proposés avec places restantes (`remaining_seats`)\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /event/:idevent/carpool",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/event/{{eventId}}/carpool",
+            "description": "Proposer un trajet (on en devient le conducteur)\nRéponse attendue : HTTP 201 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"departure_location\": \"Paris\",\n  \"departure_time\": \"2027-06-01T16:00:00Z\",\n  \"price\": 10,\n  \"seats\": 3,\n  \"max_detour\": 30\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 201) {",
+                  "const data = pm.response.json();",
+                  "pm.collectionVariables.set(\"carpoolId\", data._id || data.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /event/:idevent/carpool/:id",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/event/{{eventId}}/carpool/{{carpoolId}}",
+            "description": "Modifier un trajet (places ≥ passagers déjà inscrits)\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"departure_location\": \"Paris\",\n  \"departure_time\": \"2027-06-01T16:00:00Z\",\n  \"price\": 10,\n  \"seats\": 3,\n  \"max_detour\": 30\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /event/:idevent/carpool/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/event/{{eventId}}/carpool/{{carpoolId}}",
+            "description": "Supprimer un trajet\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /event/:idevent/carpool/:id/join",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/event/{{eventId}}/carpool/{{carpoolId}}/join",
+            "description": "Réserver une place\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /event/:idevent/carpool/:id/leave",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/event/{{eventId}}/carpool/{{carpoolId}}/leave",
+            "description": "Annuler sa place\nRéponse attendue : HTTP 200 ; JSON de la ressource ou liste selon la route. Les erreurs sont au format code/message. Exemples non exécutés."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"JSON\", () => pm.response.to.be.json);",
+                  "if (pm.response.code === 200) {",
+                  "const data = pm.response.json();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
